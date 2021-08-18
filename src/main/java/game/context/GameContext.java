@@ -21,6 +21,7 @@ public class GameContext implements Context {
     gameObjects = new ArrayList<>();
     gameObjects.add(new Ship());
     EventBus.subscribe(EventType.KEY_PRESSED, keyPressedEventHandler);
+    EventBus.subscribe(EventType.KEY_RELEASED, keyReleasedEventHandler);
   }
 
   @Override
@@ -40,6 +41,15 @@ public class GameContext implements Context {
     gameObjects.forEach(gameObject -> {
       if(gameObject.getId().compareTo(event.getObjectId()) == 0) {
         gameObject.applyInput(keyEvent);
+      }
+    });
+  };
+
+  public EventHandler keyReleasedEventHandler = event -> {
+    KeyInputEvent keyEvent = (KeyInputEvent) event;
+    gameObjects.forEach(gameObject -> {
+      if(gameObject.getId().compareTo(event.getObjectId()) == 0) {
+        gameObject.removeInput(keyEvent);
       }
     });
   };

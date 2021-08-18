@@ -6,5 +6,6 @@ public enum EventType {
   ITEM_PICKED,
   SHIP_DIED,
   KEY_PRESSED,
-  MOUSE_PRESSED;
+  MOUSE_PRESSED,
+  KEY_RELEASED;
 }

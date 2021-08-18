@@ -95,6 +95,8 @@ public abstract class GameObject implements Serializable {
 
   public abstract void applyInput(GameEvent event);
 
+  public abstract void removeInput(GameEvent event);
+
   public void updatePath(Vector velocity, double timePassed) {
     vertices = Arrays.stream(vertices).map(item -> item.additionVector(velocity, timePassed))
         .toArray(Vector[]::new);

@@ -62,6 +62,11 @@ public class Laser extends GameObject {
   @Override
   public void applyInput(GameEvent event) {}
 
+  @Override
+  public void removeInput(GameEvent event) {
+
+  }
+
   public boolean shouldBeRemoved() {
     return !(this.position.getX() > 800 + 10 ||
     this.position.getX() < 0 - 10 ||

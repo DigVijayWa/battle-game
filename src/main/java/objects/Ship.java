@@ -1,14 +1,17 @@
 package objects;
 
 import events.GameEvent;
+import game.input.KeyInput.KeyType;
 import game.input.event.KeyInputEvent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import physics.Vector;
 import utility.GameUtility;
@@ -30,6 +33,8 @@ public class Ship extends GameObject {
   private List<Laser> lasers = new LinkedList<>();
 
   private String name;
+
+  private Map<KeyType, Boolean> pressedKeys = new HashMap<>();
 
   public Ship() {
     super(3, true);
@@ -59,14 +64,15 @@ public class Ship extends GameObject {
     graphics2D.setColor(Color.WHITE);
     graphics2D.setFont(new Font("Monospace", Font.PLAIN, 12));
     graphics2D
-        .drawString("Name "+lasers.size(), (int) vertices[1].getX() + 3, (int) vertices[1].getY() + 3);
+        .drawString("Name " + lasers.size(), (int) vertices[1].getX() + 3,
+            (int) vertices[1].getY() + 3);
     if (velocity.getMagnitude() != 0) {
       graphics2D.rotate(velocity.getAngle() - Math.PI / 2,
           position.getX(), position.getY());
     }
     graphics2D.draw(objectPath);
 
-    graphics2D.drawOval((int)position.getX(), (int)position.getY(), 2,2);
+    graphics2D.drawOval((int) position.getX(), (int) position.getY(), 2, 2);
 
     if (velocity.getMagnitude() != 0) {
       graphics2D.rotate(-(velocity.getAngle() - Math.PI / 2), position.getX(), position.getY());
@@ -82,6 +88,10 @@ public class Ship extends GameObject {
   public void update(double timePassed) {
     if (movable) {
       double timePassedSeconds = 0.01666666666;
+
+      pressedKeys.entrySet().stream().filter(Entry::getValue)
+          .forEach(item -> applyInputAccordingToState(item.getKey()));
+
       velocity = velocity.additionVector(this.acceleration);
       velocity = velocity.limitVector(maxSpeed);
 
@@ -102,7 +112,31 @@ public class Ship extends GameObject {
   @Override
   public void applyInput(GameEvent event) {
     KeyInputEvent keyInputEvent = (KeyInputEvent) event;
-    switch (keyInputEvent.getKeyInput().getKeyType()) {
+
+    pressedKeys
+        .put(keyInputEvent.getKeyInput().getKeyType(), keyInputEvent.getKeyInput().isHeldDown());
+  }
+
+  @Override
+  public void removeInput(GameEvent event) {
+    KeyInputEvent keyInputEvent = (KeyInputEvent) event;
+
+    pressedKeys
+        .put(keyInputEvent.getKeyInput().getKeyType(), keyInputEvent.getKeyInput().isHeldDown());
+
+    if (keyInputEvent.getKeyInput().getKeyType() == KeyType.FIRE) {
+      this.lasers.add(new Laser(position, velocity));
+    }
+  }
+
+  public Vector calculateCentroid() {
+
+    return Arrays.stream(vertices).reduce(new Vector(0, 0), (item, acc) -> acc.additionVector(item))
+        .divideByScalar(3);
+  }
+
+  public void applyInputAccordingToState(KeyType keyType) {
+    switch (keyType) {
       case ACCELERATE:
         this.addAcceleration(
             new Vector(0, 0).setAngleAndMagnitude(this.velocity.getAngle(), maxSpeed));
@@ -115,19 +149,12 @@ public class Ship extends GameObject {
         this.velocity.setAngleAndMagnitude(this.velocity.getAngle() - differential,
             this.velocity.getMagnitude());
         break;
-      case FIRE:
-        this.lasers.add(new Laser(position, velocity));
-        break;
       case LEFT_ROTATE:
         this.velocity.setAngleAndMagnitude(this.velocity.getAngle() + differential,
             this.velocity.getMagnitude());
+        break;
+      default:
     }
-  }
-
-  public Vector calculateCentroid() {
-
-    return Arrays.stream(vertices).reduce(new Vector(0, 0), (item, acc) -> acc.additionVector(item))
-        .divideByScalar(3);
   }
 
   public double getMaxSpeed() {

@@ -33,4 +33,9 @@ public class Block extends GameObject {
   public void applyInput(GameEvent event) {
 
   }
+
+  @Override
+  public void removeInput(GameEvent event) {
+
+  }
 }
