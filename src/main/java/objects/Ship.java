@@ -18,6 +18,8 @@ import utility.GameUtility;
 
 public class Ship extends GameObject {
 
+  double timePassedSeconds = 0.01666666666;
+
   public static double maxSpeed = 200;
 
   public static double maxForce = 16;
@@ -28,7 +30,7 @@ public class Ship extends GameObject {
 
   private int eatenParticles = 0;
 
-  private double differential = Math.PI / 12;
+  private double differential = Math.PI / 24;
 
   private List<Laser> lasers = new LinkedList<>();
 
@@ -87,7 +89,6 @@ public class Ship extends GameObject {
   @Override
   public void update(double timePassed) {
     if (movable) {
-      double timePassedSeconds = 0.01666666666;
 
       pressedKeys.entrySet().stream().filter(Entry::getValue)
           .forEach(item -> applyInputAccordingToState(item.getKey()));
@@ -191,7 +192,7 @@ public class Ship extends GameObject {
   }
 
   public void addAcceleration(Vector deltaAcceleration) {
-    this.acceleration = this.acceleration.additionVector(deltaAcceleration);
+    this.acceleration = this.acceleration.additionVector(deltaAcceleration, timePassedSeconds);
     this.acceleration = this.acceleration.limitVector(maxForce);
   }
 

@@ -65,12 +65,10 @@ public class Vector {
 
   public Vector limitVector(double limit) {
     double magnitudeSquared = this.getMagnitudeSquare();
-    Vector result = new Vector(this.x,this.y);
     if(magnitudeSquared > limit*limit) {
-      result = this.divideByScalar(Math.sqrt(magnitudeSquared));
-      result.multiplyByScalar(limit);
+      return this.normalize().multiplyByScalar(limit);
     }
-    return result;
+    return this;
   }
 
   public boolean equals(Vector otherVector, double precision) {

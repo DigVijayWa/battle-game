@@ -38,20 +38,23 @@ public class GameContext implements Context {
   public EventHandler keyPressedEventHandler = event -> {
 
     KeyInputEvent keyEvent = (KeyInputEvent) event;
-    gameObjects.forEach(gameObject -> {
-      if(gameObject.getId().compareTo(event.getObjectId()) == 0) {
+
+    for (GameObject gameObject : gameObjects) {
+      if (gameObject.getId().compareTo(event.getObjectId()) == 0) {
         gameObject.applyInput(keyEvent);
+        break;
       }
-    });
+    }
   };
 
   public EventHandler keyReleasedEventHandler = event -> {
     KeyInputEvent keyEvent = (KeyInputEvent) event;
-    gameObjects.forEach(gameObject -> {
-      if(gameObject.getId().compareTo(event.getObjectId()) == 0) {
+    for (GameObject gameObject : gameObjects) {
+      if (gameObject.getId().compareTo(event.getObjectId()) == 0) {
         gameObject.removeInput(keyEvent);
+        break;
       }
-    });
+    }
   };
 
   public static List<GameObject> getActiveObjects() {
