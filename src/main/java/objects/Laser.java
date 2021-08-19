@@ -7,7 +7,7 @@ import physics.Vector;
 
 public class Laser extends GameObject {
 
-  public double maxSpeed = 400;
+  public double maxSpeed = 800;
 
   public double maxForce = 16;
 

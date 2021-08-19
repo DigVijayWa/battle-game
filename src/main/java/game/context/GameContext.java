@@ -7,6 +7,7 @@ import game.input.event.KeyInputEvent;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
+import objects.Block;
 import objects.GameObject;
 import objects.Ship;
 
@@ -20,6 +21,7 @@ public class GameContext implements Context {
     this.contextType = ContextType.GAME;
     gameObjects = new ArrayList<>();
     gameObjects.add(new Ship());
+    gameObjects.add(new Block());
     EventBus.subscribe(EventType.KEY_PRESSED, keyPressedEventHandler);
     EventBus.subscribe(EventType.KEY_RELEASED, keyReleasedEventHandler);
   }
