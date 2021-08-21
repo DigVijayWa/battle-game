@@ -4,6 +4,7 @@ public enum EventType {
   COLLISION,
   SHIP_ADDED,
   ITEM_PICKED,
+  ITEM_DROPPED,
   SHIP_DIED,
   KEY_PRESSED,
   MOUSE_PRESSED,

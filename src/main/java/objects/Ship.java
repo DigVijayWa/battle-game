@@ -19,21 +19,23 @@ public class Ship extends GameObject {
 
   double timePassedSeconds = 0.01666666666;
 
-  public static double maxSpeed = 200;
+  public static double maxSpeed = 100;
 
-  public static double maxForce = 16;
+  private double maxForce = 8;
 
-  public static double attractionDistance = 100;
+  public double attractionDistance = 100;
 
-  public static double minForce = 80;
+  private double minForce = 80;
 
   private int eatenParticles = 0;
 
-  private double differential = Math.PI / 24;
+  private double differential = Math.PI / 35;
 
   private String name;
 
   private boolean destroyed;
+
+  private int health;
 
   private Map<KeyType, Boolean> pressedKeys = new HashMap<>();
 
@@ -207,5 +209,37 @@ public class Ship extends GameObject {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public double getMinForce() {
+    return minForce;
+  }
+
+  public void setMinForce(double minForce) {
+    this.minForce = minForce;
+  }
+
+  public double getDifferential() {
+    return differential;
+  }
+
+  public void setDifferential(double differential) {
+    this.differential = differential;
+  }
+
+  public boolean isDestroyed() {
+    return destroyed;
+  }
+
+  public void setDestroyed(boolean destroyed) {
+    this.destroyed = destroyed;
+  }
+
+  public int getHealth() {
+    return health;
+  }
+
+  public void setHealth(int health) {
+    this.health = health;
   }
 }

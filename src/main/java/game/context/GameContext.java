@@ -4,6 +4,7 @@ import events.CollisionEvent;
 import events.EventBus;
 import events.EventHandler;
 import events.EventType;
+import events.ItemPickedEvent;
 import game.input.event.KeyInputEvent;
 import java.awt.Graphics2D;
 import java.util.LinkedList;
@@ -14,6 +15,7 @@ import objects.Asteroid;
 import objects.GameObject;
 import objects.GameObjectType;
 import objects.Ship;
+import objects.items.ItemType;
 import utility.GameUtility;
 
 public class GameContext implements Context {
@@ -27,7 +29,7 @@ public class GameContext implements Context {
     gameObjects = new LinkedList<>();
     gameObjects.add(new Ship());
 
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 5; i++) {
       gameObjects.add(new Asteroid((int) GameUtility.generateRandomValuesInRange(4, 10)));
     }
 
@@ -132,6 +134,25 @@ public class GameContext implements Context {
               gameObject.getId()));
         }
       }
+    }
+  }
+
+  public void handleObjects(GameObject shipObject, GameObject otherObject) {
+    switch (otherObject.getGameObjectType()) {
+      case SHIP:
+        break;
+      case SPECIAL_ITEM:
+        EventBus.publish(
+            new ItemPickedEvent(1, EventType.ITEM_PICKED, shipObject.getId(), otherObject.getId(),
+                ItemType.SPEED_BOOSTER));
+        break;
+      case ASTEROID:
+      case BLOCK:
+      case LASER:
+        EventBus.publish(new CollisionEvent(1, EventType.COLLISION, shipObject.getId(),
+            otherObject.getId()));
+        break;
+      default:
     }
   }
 

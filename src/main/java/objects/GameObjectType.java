@@ -4,5 +4,6 @@ public enum GameObjectType {
   LASER,
   SHIP,
   BLOCK,
-  ASTEROID;
+  ASTEROID,
+  SPECIAL_ITEM;
 }
