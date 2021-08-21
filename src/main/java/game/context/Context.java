@@ -1,8 +1,6 @@
 package game.context;
 
 import java.awt.Graphics2D;
-import java.util.List;
-import objects.GameObject;
 
 public interface Context {
 

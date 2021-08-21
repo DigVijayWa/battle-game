@@ -3,20 +3,27 @@ package objects;
 import events.GameEvent;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.UUID;
 import physics.Vector;
 
 public class Laser extends GameObject {
+
+  private UUID shipId;
 
   public double maxSpeed = 800;
 
   public double maxForce = 16;
 
-  public Laser(Vector position, Vector velocity) {
-    super(4, true);
-    vertices[0] = new Vector(position.getX(), position.getY()-1);
-    vertices[1] = new Vector(position.getX(), position.getY()+1);
-    vertices[2] = new Vector(position.getX() + 10, position.getY()+1);
-    vertices[3] = new Vector(position.getX() + 10, position.getY()-1);
+  boolean destroyed = false;
+
+  public Laser(Vector position, Vector velocity, UUID shipId) {
+    super(4, true, GameObjectType.LASER);
+    vertices[0] = new Vector(position.getX(), position.getY() - 1);
+    vertices[1] = new Vector(position.getX(), position.getY() + 1);
+    vertices[2] = new Vector(position.getX() + 10, position.getY() + 1);
+    vertices[3] = new Vector(position.getX() + 10, position.getY() - 1);
+
+    this.shipId = shipId;
 
     this.velocity = new Vector(0, 0).setAngleAndMagnitude(velocity.getAngle(), maxSpeed);
     calculatePath();
@@ -25,11 +32,12 @@ public class Laser extends GameObject {
 
   public Laser(Vector position, Vector acceleration, Vector velocity,
       Vector gravity, int size, boolean movable, int totalVertices) {
-    super(position, acceleration, velocity, gravity, size, movable, totalVertices);
+    super(position, acceleration, velocity, gravity, size, movable, totalVertices,
+        GameObjectType.LASER);
   }
 
   public Laser(Vector position, Vector acceleration, Vector velocity, int size, boolean movable) {
-    super(position, acceleration, velocity, size, movable);
+    super(position, acceleration, velocity, size, movable, GameObjectType.LASER);
   }
 
   @Override
@@ -60,18 +68,25 @@ public class Laser extends GameObject {
   }
 
   @Override
-  public void applyInput(GameEvent event) {}
+  public void applyInput(GameEvent event) {
+  }
 
   @Override
   public void removeInput(GameEvent event) {
 
   }
 
+  @Override
   public boolean shouldBeRemoved() {
-    return !(this.position.getX() > 800 + 10 ||
-    this.position.getX() < 0 - 10 ||
-    this.position.getY() > 800 + 10 ||
-    this.position.getY() < 0 - 10);
+    return (this.position.getX() > 800 + 10 ||
+        this.position.getX() < 0 - 10 ||
+        this.position.getY() > 800 + 10 ||
+        this.position.getY() < 0 - 10) || destroyed;
+  }
+
+  @Override
+  public void handleCollision(GameEvent gameEvent) {
+    this.destroyed = true;
   }
 
   public Vector calculateCentroid() {

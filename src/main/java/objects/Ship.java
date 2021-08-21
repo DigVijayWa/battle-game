@@ -1,6 +1,7 @@
 package objects;
 
 import events.GameEvent;
+import game.context.GameContext;
 import game.input.KeyInput.KeyType;
 import game.input.event.KeyInputEvent;
 import java.awt.Color;
@@ -8,11 +9,9 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import physics.Vector;
 import utility.GameUtility;
 
@@ -32,14 +31,14 @@ public class Ship extends GameObject {
 
   private double differential = Math.PI / 24;
 
-  private List<Laser> lasers = new LinkedList<>();
-
   private String name;
+
+  private boolean destroyed;
 
   private Map<KeyType, Boolean> pressedKeys = new HashMap<>();
 
   public Ship() {
-    super(3, true);
+    super(3, true, GameObjectType.SHIP);
     double offSet = GameUtility.mapRandomValue(Math.random());
     vertices[0] = new Vector(offSet, offSet);
     vertices[1] = new Vector(5 + offSet, 19.319 + offSet);
@@ -53,11 +52,11 @@ public class Ship extends GameObject {
 
   public Ship(Vector position, Vector acceleration, Vector velocity, Vector gravity, int size,
       boolean movable) {
-    super(position, acceleration, velocity, gravity, size, movable, 3);
+    super(position, acceleration, velocity, gravity, size, movable, 3, GameObjectType.SHIP);
   }
 
   public Ship(Vector position, Vector acceleration, Vector velocity, int size, boolean movable) {
-    super(position, acceleration, velocity, size, movable);
+    super(position, acceleration, velocity, size, movable, GameObjectType.SHIP);
   }
 
   @Override
@@ -66,7 +65,7 @@ public class Ship extends GameObject {
     graphics2D.setColor(Color.WHITE);
     graphics2D.setFont(new Font("Monospace", Font.PLAIN, 12));
     graphics2D
-        .drawString("Name " + lasers.size(), (int) vertices[1].getX() + 3,
+        .drawString("Name " + GameContext.getActiveObjects().size(), (int) vertices[1].getX() + 3,
             (int) vertices[1].getY() + 3);
     if (velocity.getMagnitude() != 0) {
       graphics2D.rotate(velocity.getAngle() - Math.PI / 2,
@@ -79,8 +78,6 @@ public class Ship extends GameObject {
     if (velocity.getMagnitude() != 0) {
       graphics2D.rotate(-(velocity.getAngle() - Math.PI / 2), position.getX(), position.getY());
     }
-
-    lasers.forEach(laser -> laser.render(graphics2D));
 
     graphics2D.setColor(prevColor);
     objectPath.reset();
@@ -97,10 +94,6 @@ public class Ship extends GameObject {
       velocity = velocity.limitVector(maxSpeed);
 
       updatePath(velocity, timePassedSeconds);
-
-      lasers.forEach(laser -> laser.update(timePassed));
-
-      lasers = lasers.stream().filter(Laser::shouldBeRemoved).collect(Collectors.toList());
 
       calculatePath();
 
@@ -126,8 +119,20 @@ public class Ship extends GameObject {
         .put(keyInputEvent.getKeyInput().getKeyType(), keyInputEvent.getKeyInput().isHeldDown());
 
     if (keyInputEvent.getKeyInput().getKeyType() == KeyType.FIRE) {
-      this.lasers.add(new Laser(position, velocity));
+      List<GameObject> gameObjects = GameContext.getActiveObjects();
+      gameObjects.add(new Laser(position, velocity, this.id));
+      GameContext.setGameObjects(gameObjects);
     }
+  }
+
+  @Override
+  public boolean shouldBeRemoved() {
+    return destroyed;
+  }
+
+  @Override
+  public void handleCollision(GameEvent gameEvent) {
+    this.destroyed = true;
   }
 
   public Vector calculateCentroid() {

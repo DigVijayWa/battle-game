@@ -1,7 +1,6 @@
 package objects;
 
 import events.GameEvent;
-import game.input.Input;
 import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Path2D.Double;
@@ -10,6 +9,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import physics.Vector;
+import utility.GameUtility;
 
 public abstract class GameObject implements Serializable {
 
@@ -30,6 +30,8 @@ public abstract class GameObject implements Serializable {
 
   UUID id;
 
+  GameObjectType gameObjectType;
+
   public UUID getId() {
     return id;
   }
@@ -38,9 +40,10 @@ public abstract class GameObject implements Serializable {
     this.id = id;
   }
 
-  public GameObject(int totalVertices) {
+  public GameObject(int totalVertices, GameObjectType gameObjectType) {
 
-    position = new Vector(100, 100);
+    position = new Vector(GameUtility.generateRandomValuesInRange(10, 800),
+        GameUtility.generateRandomValuesInRange(10, 800));
 
     id = UUID.randomUUID();
 
@@ -50,11 +53,14 @@ public abstract class GameObject implements Serializable {
     friction = new Vector(1, 1);
     size = 2;
     this.vertices = new Vector[totalVertices];
+    this.gameObjectType = gameObjectType;
   }
 
-  public GameObject(int totalVertices, boolean movable) {
+  public GameObject(int totalVertices, boolean movable, GameObjectType gameObjectType) {
 
-    position = new Vector(100, 100);
+    position = new Vector(GameUtility.generateRandomValuesInRange(10, 800),
+        GameUtility.generateRandomValuesInRange(10, 800));
+
     this.movable = movable;
 
     id = UUID.randomUUID();
@@ -65,10 +71,11 @@ public abstract class GameObject implements Serializable {
     friction = new Vector(1, 1);
     size = 2;
     this.vertices = new Vector[totalVertices];
+    this.gameObjectType = gameObjectType;
   }
 
   public GameObject(Vector position, Vector acceleration, Vector velocity, Vector gravity, int size,
-      boolean movable, int totalVertices) {
+      boolean movable, int totalVertices, GameObjectType gameObjectType) {
     id = UUID.randomUUID();
     this.position = position;
     this.acceleration = acceleration;
@@ -77,16 +84,18 @@ public abstract class GameObject implements Serializable {
     this.size = size;
     this.movable = movable;
     this.vertices = new Vector[totalVertices];
+    this.gameObjectType = gameObjectType;
   }
 
   public GameObject(Vector position, Vector acceleration, Vector velocity, int size,
-      boolean movable) {
+      boolean movable, GameObjectType gameObjectType) {
     id = UUID.randomUUID();
     this.position = position;
     this.acceleration = acceleration;
     this.velocity = velocity;
     this.size = size;
     this.movable = movable;
+    this.gameObjectType = gameObjectType;
   }
 
   public abstract void render(Graphics2D g);
@@ -96,6 +105,10 @@ public abstract class GameObject implements Serializable {
   public abstract void applyInput(GameEvent event);
 
   public abstract void removeInput(GameEvent event);
+
+  public abstract boolean shouldBeRemoved();
+
+  public abstract void handleCollision(GameEvent gameEvent);
 
   public void updatePath(Vector velocity, double timePassed) {
     vertices = Arrays.stream(vertices).map(item -> item.additionVector(velocity, timePassed))
@@ -168,6 +181,22 @@ public abstract class GameObject implements Serializable {
     this.movable = movable;
   }
 
+  public Vector[] getVertices() {
+    return vertices;
+  }
+
+  public void setVertices(Vector[] vertices) {
+    this.vertices = vertices;
+  }
+
+  public Path2D getObjectPath() {
+    return objectPath;
+  }
+
+  public void setObjectPath(Path2D objectPath) {
+    this.objectPath = objectPath;
+  }
+
   @Override
   public int hashCode() {
     return id.hashCode();
@@ -176,5 +205,13 @@ public abstract class GameObject implements Serializable {
   @Override
   public boolean equals(Object obj) {
     return super.equals(obj);
+  }
+
+  public GameObjectType getGameObjectType() {
+    return gameObjectType;
+  }
+
+  public void setGameObjectType(GameObjectType gameObjectType) {
+    this.gameObjectType = gameObjectType;
   }
 }
