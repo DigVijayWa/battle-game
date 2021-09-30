@@ -6,16 +6,26 @@ import events.EventHandler;
 import events.EventType;
 import events.ItemPickedEvent;
 import game.input.event.KeyInputEvent;
+import game.map.MapMaker;
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import objects.Asteroid;
+import objects.Block;
 import objects.GameObject;
 import objects.GameObjectType;
+import objects.Laser;
 import objects.Ship;
+import objects.SpeedBoost;
+import objects.enemy.MovingEnemy;
+import objects.enemy.StationaryEnemy;
 import objects.items.ItemType;
+import physics.Vector;
 import utility.GameUtility;
 
 public class GameContext implements Context {
@@ -23,6 +33,8 @@ public class GameContext implements Context {
   private ContextType contextType;
 
   private static List<GameObject> gameObjects;
+
+  private static Map<Vector, Boolean> trackerPoints = new HashMap<>();
 
   public GameContext() {
     this.contextType = ContextType.GAME;
@@ -33,9 +45,28 @@ public class GameContext implements Context {
       gameObjects.add(new Asteroid((int) GameUtility.generateRandomValuesInRange(4, 10)));
     }
 
+    gameObjects.add(new SpeedBoost());
+    gameObjects.add(new StationaryEnemy());
+    gameObjects.add(new MovingEnemy());
+
+    int[][] map = MapMaker.getRGBArray();
+
+    for (int i = 0; i < 80; i++) {
+      for (int j = 0; j < 80; j++) {
+
+        boolean shouldPutBlock = map[j][i] == Color.BLACK.getRGB();
+        trackerPoints.put(new Vector(j * 10, i * 10), !shouldPutBlock);
+
+        if (shouldPutBlock) {
+          gameObjects.add(new Block(j * 10, i * 10));
+        }
+      }
+    }
+
     EventBus.subscribe(EventType.KEY_PRESSED, keyPressedEventHandler);
     EventBus.subscribe(EventType.KEY_RELEASED, keyReleasedEventHandler);
     EventBus.subscribe(EventType.COLLISION, collisionEventHandler);
+    EventBus.subscribe(EventType.ITEM_PICKED, itemPickedEventHandler);
   }
 
   @Override
@@ -47,7 +78,10 @@ public class GameContext implements Context {
 
   @Override
   public synchronized void update(double timePassed) {
-    gameObjects.forEach(gameObject -> gameObject.update(timePassed));
+
+    for (int i = gameObjects.size() - 1; i >= 0; i--) {
+      gameObjects.get(i).update(timePassed);
+    }
     removeObjects();
     checkForCollisionsWithLaser();
     checkForCollisions();
@@ -91,6 +125,17 @@ public class GameContext implements Context {
     }
   };
 
+  public EventHandler itemPickedEventHandler = event -> {
+    ItemPickedEvent itemPickedEvent = (ItemPickedEvent) event;
+
+    for (GameObject gameObject : gameObjects) {
+      if (gameObject.getId().compareTo(itemPickedEvent.getObjectId()) == 0
+          || gameObject.getId().compareTo(itemPickedEvent.getItemId()) == 0) {
+        gameObject.handleCollision(itemPickedEvent);
+      }
+    }
+  };
+
 
   public void checkForCollisions() {
     List<GameObject> shipObjectList = gameObjects.stream()
@@ -109,8 +154,7 @@ public class GameContext implements Context {
       for (GameObject gameObject : otherObjects) {
         if (shipObject.getObjectPath().getBounds2D()
             .intersects(gameObject.getObjectPath().getBounds2D())) {
-          EventBus.publish(new CollisionEvent(1, EventType.COLLISION, shipObject.getId(),
-              gameObject.getId()));
+          handleObjects(shipObject, gameObject);
         }
       }
     }
@@ -128,8 +172,11 @@ public class GameContext implements Context {
 
     for (GameObject gameObject : otherGameObjects) {
       for (GameObject laser : lasers) {
+
+        Laser laserObject = (Laser) laser;
         if (laser.getObjectPath().getBounds2D()
-            .intersects(gameObject.getObjectPath().getBounds2D())) {
+            .intersects(gameObject.getObjectPath().getBounds2D()) && !laserObject.getShipId()
+            .equals(gameObject.getId())) {
           EventBus.publish(new CollisionEvent(1, EventType.COLLISION, laser.getId(),
               gameObject.getId()));
         }
@@ -176,5 +223,13 @@ public class GameContext implements Context {
 
   public static void setGameObjects(List<GameObject> gameObjects) {
     GameContext.gameObjects = gameObjects;
+  }
+
+  public static Map<Vector, Boolean> getTrackerPoints() {
+    return trackerPoints;
+  }
+
+  public static void setTrackerPoints(Map<Vector, Boolean> trackerPoints) {
+    GameContext.trackerPoints = trackerPoints;
   }
 }

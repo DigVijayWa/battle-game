@@ -5,5 +5,6 @@ public enum GameObjectType {
   SHIP,
   BLOCK,
   ASTEROID,
-  SPECIAL_ITEM;
+  SPECIAL_ITEM,
+  ENEMY;
 }

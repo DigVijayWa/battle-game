@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import objects.enemy.MovingEnemy;
+import physics.Vector;
 
 public class GameUtility {
 
@@ -91,5 +93,19 @@ public class GameUtility {
       output[x] = dNoise / fScaleAcc;
     }
     return (output);
+  }
+
+  public static Vector calculateEffectiveVector(Vector currentPosition, Vector targetPosition) {
+    return targetPosition.subtractionVector(currentPosition);
+  }
+
+  public static Vector seek(Vector position, Vector target, Vector currentVelocity, double scalar) {
+    Vector desired = GameUtility
+        .calculateEffectiveVector(position, target)
+        .normalize()
+        .multiplyByScalar(scalar);
+
+    return GameUtility
+        .calculateEffectiveVector(currentVelocity, desired).limitVector(MovingEnemy.maxForce);
   }
 }

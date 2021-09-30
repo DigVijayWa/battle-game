@@ -20,7 +20,7 @@ public abstract class GameObject implements Serializable {
 
   Vector gravity;
 
-  Vector[] vertices;
+  public Vector[] vertices;
 
   Path2D objectPath = new Double();
 

@@ -18,10 +18,10 @@ public class Laser extends GameObject {
 
   public Laser(Vector position, Vector velocity, UUID shipId) {
     super(4, true, GameObjectType.LASER);
-    vertices[0] = new Vector(position.getX(), position.getY() - 1);
-    vertices[1] = new Vector(position.getX(), position.getY() + 1);
-    vertices[2] = new Vector(position.getX() + 10, position.getY() + 1);
-    vertices[3] = new Vector(position.getX() + 10, position.getY() - 1);
+    vertices[0] = new Vector(position.getX()+5, position.getY() - 1);
+    vertices[1] = new Vector(position.getX()-5, position.getY() + 1);
+    vertices[2] = new Vector(position.getX() + 5, position.getY() + 1);
+    vertices[3] = new Vector(position.getX() - 5, position.getY() - 1);
 
     this.shipId = shipId;
 
@@ -91,5 +91,37 @@ public class Laser extends GameObject {
 
   public Vector calculateCentroid() {
     return new Vector((vertices[0].getX() + 5), vertices[0].getY() + 1);
+  }
+
+  public UUID getShipId() {
+    return shipId;
+  }
+
+  public void setShipId(UUID shipId) {
+    this.shipId = shipId;
+  }
+
+  public double getMaxSpeed() {
+    return maxSpeed;
+  }
+
+  public void setMaxSpeed(double maxSpeed) {
+    this.maxSpeed = maxSpeed;
+  }
+
+  public double getMaxForce() {
+    return maxForce;
+  }
+
+  public void setMaxForce(double maxForce) {
+    this.maxForce = maxForce;
+  }
+
+  public boolean isDestroyed() {
+    return destroyed;
+  }
+
+  public void setDestroyed(boolean destroyed) {
+    this.destroyed = destroyed;
   }
 }

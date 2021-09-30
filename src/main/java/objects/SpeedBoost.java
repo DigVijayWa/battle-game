@@ -12,8 +12,8 @@ public class SpeedBoost extends GameObject {
 
   ItemType itemType = ItemType.SPEED_BOOSTER;
 
-  public SpeedBoost(int totalVertices, GameObjectType gameObjectType) {
-    super(4, true, GameObjectType.LASER);
+  public SpeedBoost() {
+    super(4, true, GameObjectType.SPECIAL_ITEM);
     vertices[0] = new Vector(position.getX(), position.getY() - 10);
     vertices[1] = new Vector(position.getX(), position.getY() + 10);
     vertices[2] = new Vector(position.getX() + 20, position.getY() + 10);

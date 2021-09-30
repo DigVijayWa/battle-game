@@ -18,6 +18,18 @@ public class Block extends GameObject {
     this.position = calculateCentroid();
   }
 
+  public Block(int x, int y) {
+    super(4, false, GameObjectType.BLOCK);
+    position = new Vector(x, y);
+    vertices[0] = new Vector(position.getX(), position.getY());
+    vertices[1] = new Vector(position.getX(), position.getY()+10);
+    vertices[2] = new Vector(position.getX() + 10, position.getY()+10);
+    vertices[3] = new Vector(position.getX() + 10, position.getY());
+
+    calculatePath();
+    //this.position = calculateCentroid();
+  }
+
   public Block(Vector position, Vector acceleration, Vector velocity,
       Vector gravity, int size, boolean movable, int totalVertices) {
     super(position, acceleration, velocity, gravity, size, movable, totalVertices, GameObjectType.BLOCK);
@@ -32,9 +44,9 @@ public class Block extends GameObject {
 
     Color prevColor = g.getColor();
     g.setColor(Color.WHITE);
-    g.translate(position.getX(), position.getY());
+    //g.translate(position.getX(), position.getY());
     g.draw(objectPath);
-    g.translate(-position.getX(), -position.getY());
+    //g.translate(-position.getX(), -position.getY());
 
     g.setColor(prevColor);
   }
@@ -65,6 +77,6 @@ public class Block extends GameObject {
   }
 
   public Vector calculateCentroid() {
-    return new Vector((vertices[0].getX() + 5), vertices[0].getY() + 1);
+    return new Vector((vertices[0].getX() + 5), vertices[0].getY() + 5);
   }
 }

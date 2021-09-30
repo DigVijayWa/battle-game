@@ -1,5 +1,6 @@
 package objects;
 
+import events.EventType;
 import events.GameEvent;
 import game.context.GameContext;
 import game.input.KeyInput.KeyType;
@@ -134,7 +135,12 @@ public class Ship extends GameObject {
 
   @Override
   public void handleCollision(GameEvent gameEvent) {
-    this.destroyed = true;
+
+    if(gameEvent.getEventType() == EventType.COLLISION) {
+      this.destroyed = true;
+    } else if(gameEvent.getEventType() == EventType.ITEM_PICKED) {
+      this.setMaxSpeed(this.getMaxSpeed() + 100);
+    }
   }
 
   public Vector calculateCentroid() {
